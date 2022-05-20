@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Lokesh/YayatoTaxi/YayatoPartnerApp/YayatoPartnerApp/app/src/main/res/layout/activity_add_vehical_on_rent.xml" value="0.20416666666666666" />
+        <entry key="..\:/Lokesh/YayatoTaxi/YayatoPartnerApp/YayatoPartnerApp/app/src/main/res/layout/activity_add_vehicle.xml" value="0.20416666666666666" />
+        <entry key="..\:/Lokesh/YayatoTaxi/YayatoPartnerApp/YayatoPartnerApp/app/src/main/res/layout/activity_driver_requests.xml" value="0.20416666666666666" />
+        <entry key="..\:/Lokesh/YayatoTaxi/YayatoPartnerApp/YayatoPartnerApp/app/src/main/res/layout/activity_home.xml" value="0.20416666666666666" />
+        <entry key="..\:/Lokesh/YayatoTaxi/YayatoPartnerApp/YayatoPartnerApp/app/src/main/res/layout/activity_sign_up.xml" value="0.20416666666666666" />
+        <entry key="..\:/Lokesh/YayatoTaxi/YayatoPartnerApp/YayatoPartnerApp/app/src/main/res/layout/activity_vehical_list.xml" value="0.20416666666666666" />
+        <entry key="..\:/Lokesh/YayatoTaxi/YayatoPartnerApp/YayatoPartnerApp/app/src/main/res/layout/activity_wallet.xml" value="0.20416666666666666" />
+        <entry key="..\:/Lokesh/YayatoTaxi/YayatoPartnerApp/YayatoPartnerApp/app/src/main/res/layout/adapter_all_vehicle.xml" value="0.20416666666666666" />
+        <entry key="..\:/Lokesh/YayatoTaxi/YayatoPartnerApp/YayatoPartnerApp/app/src/main/res/layout/adapter_home_vehicle.xml" value="0.20416666666666666" />
+        <entry key="..\:/Lokesh/YayatoTaxi/YayatoPartnerApp/YayatoPartnerApp/app/src/main/res/layout/adapter_transactions.xml" value="0.20416666666666666" />
+        <entry key="..\:/Lokesh/YayatoTaxi/YayatoPartnerApp/YayatoPartnerApp/app/src/main/res/layout/adapter_vehicle_request.xml" value="0.20416666666666666" />
+        <entry key="..\:/Lokesh/YayatoTaxi/YayatoPartnerApp/YayatoPartnerApp/app/src/main/res/layout/app_layout_home.xml" value="0.20416666666666666" />
+        <entry key="..\:/Lokesh/YayatoTaxi/YayatoPartnerApp/YayatoPartnerApp/app/src/main/res/layout/dashboard_driver_drawer.xml" value="0.20416666666666666" />
+        <entry key="..\:/Lokesh/YayatoTaxi/YayatoPartnerApp/YayatoPartnerApp/app/src/main/res/layout/send_money_dialog_new.xml" value="0.20416666666666666" />
+        <entry key="..\:/MyProjects/YayatoPartnerApp/YayatoPartnerApp/app/src/main/res/layout/activity_add_vehical_on_rent.xml" value="0.18854166666666666" />
+        <entry key="..\:/MyProjects/YayatoPartnerApp/YayatoPartnerApp/app/src/main/res/layout/adapter_home_vehicle.xml" value="0.18854166666666666" />
+        <entry key="..\:/MyProjects/YayatoPartnerApp/YayatoPartnerApp/app/src/main/res/layout/app_layout_home.xml" value="0.1" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>
