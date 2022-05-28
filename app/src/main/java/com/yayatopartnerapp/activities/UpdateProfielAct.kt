@@ -7,7 +7,6 @@ import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
@@ -15,7 +14,8 @@ import android.util.Log
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.databinding.DataBindingUtil
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.Place
@@ -23,26 +23,19 @@ import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.gson.Gson
 import com.yayatopartnerapp.R
-import com.yayatopartnerapp.databinding.ActivityUpdateProfileDriverBinding
 import com.yayatopartnerapp.models.ModelLogin
 import com.yayatopartnerapp.utils.*
-import com.yayatotaxi.utils.retrofit.Api
-import com.yayatotaxi.utils.retrofit.ApiFactory
-import kotlinx.android.synthetic.main.activity_update_profile_driver.*
+import com.yayatopartnerapp.viewmodel.UpdateProfileViewModel
+import com.yayatotaxi.utils.*
+import kotlinx.android.synthetic.main.activity_update_profile.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import okhttp3.ResponseBody
-import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.File
 
-class UpdateProfileDriverAct : AppCompatActivity() {
-
-    var mContext: Context = this@UpdateProfileDriverAct
-    lateinit var binding: ActivityUpdateProfileDriverBinding
+class UpdateProfielAct : AppCompatActivity(){
+    val TAG = "UpdateProfielAct";
+    var mContext: Context = this@UpdateProfielAct
     private var PERMISSION_ID: Int = 1001
     private var AUTOCOMPLETE_REQUEST_CODE: Int = 101
     private val GALLERY = 0;
@@ -52,37 +45,47 @@ class UpdateProfileDriverAct : AppCompatActivity() {
     lateinit var modelLogin: ModelLogin
     var profileImage: File? = null
     private var latLng: LatLng? = null
+    var updateProfileViewModel : UpdateProfileViewModel? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this,R.layout.activity_update_profile_driver)
+        setContentView(R.layout.activity_update_profile)
         sharedPref = SharedPref(mContext)
         modelLogin = sharedPref.getUserDetails(AppConstant.USER_DETAILS)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        itit()
+        updateProfileViewModel = ViewModelProviders.of(this).get(UpdateProfileViewModel::class.java)
+        updateProfileViewModel!!.init(mContext)
+        initViews()
+
+        updateProfileViewModel!!.getUpdateProfileDataViewModel()!!.observe(this, {
+            if (it != null) {
+                modelLogin = it;
+                Log.e("update profile data===", Gson()!!.toJson(modelLogin))
+                Toast.makeText(mContext,R.string.profile_updated, Toast.LENGTH_LONG)
+                sharedPref.setBooleanValue(AppConstant.IS_REGISTER, true)
+                sharedPref.setUserDetails(AppConstant.USER_DETAILS, modelLogin)
+                finish()
+
+            } else {
+                MyApplication.showAlert(mContext, getString(R.string.invalid_input))
+
+            }
+        })
+
     }
 
-    private fun itit() {
-
+    private fun initViews() {
+        setUserDataaa()
         ivBack.setOnClickListener { finish() }
-
         try {
-            latLng = LatLng(modelLogin!!.getResult()!!.lat!!.toDouble(), modelLogin!!.getResult()!!.lon!!.toDouble())
+            latLng = LatLng(
+                modelLogin!!.getResult()!!.lat!!.toDouble(),
+                modelLogin!!.getResult()!!.lon!!.toDouble()
+            )
         } catch (e: Exception) {
         }
 
-        etFirstName.setText(modelLogin?.getResult()?.first_name)
-        etLastName.setText(modelLogin?.getResult()?.last_name)
-        etPhone.setText(modelLogin?.getResult()?.mobile)
-        etEmail.setText(modelLogin?.getResult()?.email)
-        etAdd1.setText(modelLogin?.getResult()?.address)
-
-        Log.e("modelLogin", "modelLogin = " + Gson().toJson(modelLogin))
-
-        Glide.with(mContext).load(modelLogin!!.getResult()?.image)
-            .placeholder(R.drawable.user_ic)
-            .error(R.drawable.user_ic)
-            .into(profileImageSetUpdate)
 
         etAdd1.setOnClickListener {
             val fields = listOf(
@@ -105,91 +108,73 @@ class UpdateProfileDriverAct : AppCompatActivity() {
         }
 
         btnSave.setOnClickListener {
-            if (TextUtils.isEmpty(etFirstName.text.toString().trim())) {
-                MyApplication.showAlert(mContext,getString(R.string.enter_name_firsttext))
-            } else if (TextUtils.isEmpty(etLastName.text.toString().trim())) {
-                MyApplication.showAlert(mContext,getString(R.string.enter_name_lasttext))
-            } else if (TextUtils.isEmpty(etEmail.text.toString().trim())) {
-                MyApplication.showAlert(mContext,getString(R.string.enter_email_text))
-            } else if (TextUtils.isEmpty(etPhone.text.toString().trim())) {
-                MyApplication.showAlert(mContext,getString(R.string.enter_phone_text))
-            } else if (TextUtils.isEmpty(etAdd1.text.toString().trim())) {
-                MyApplication.showAlert(mContext,getString(R.string.enter_address1_text))
-            } else if (!ProjectUtil.isValidEmail(etEmail.text.toString().trim())) {
-                MyApplication.showAlert(mContext,getString(R.string.enter_valid_email))
-            } else {
-                updateDriverProfile()
-            }
+           validation()
         }
+
+
     }
 
-    fun updateDriverProfile() {
-        ProjectUtil.showProgressDialog(mContext, false, getString(R.string.please_wait))
-
-        val profileFilePart: MultipartBody.Part
-        var lat: RequestBody?
-        var lon: RequestBody?
-
-        val first_name: RequestBody = RequestBody.create(MediaType.parse("text/plain"), etFirstName.text.toString().trim())
-        val last_name: RequestBody = RequestBody.create(MediaType.parse("text/plain"), etLastName.text.toString().trim())
-        val email: RequestBody = RequestBody.create(MediaType.parse("text/plain"), etEmail.text.toString().trim())
-        val mobile: RequestBody = RequestBody.create(MediaType.parse("text/plain"), etPhone.text.toString().trim())
-        val address: RequestBody = RequestBody.create(MediaType.parse("text/plain"), etAdd1.text.toString().trim())
-
-        try {
-            lat = RequestBody.create(MediaType.parse("text/plain"), latLng!!.latitude.toString())
-            lon = RequestBody.create(MediaType.parse("text/plain"), latLng!!.longitude.toString())
-        } catch (e: java.lang.Exception) {
-            lat = RequestBody.create(MediaType.parse("text/plain"), "")
-            lon = RequestBody.create(MediaType.parse("text/plain"), "")
-        }
-
-        val type = RequestBody.create(MediaType.parse("text/plain"), "DRIVER")
-        val id: RequestBody =
-            RequestBody.create(MediaType.parse("text/plain"), modelLogin.getResult()?.id)
+    private fun validation() {
+        var lat : String
+        var lon : String
+        val profileFilePart : MultipartBody.Part
         val attachmentEmpty: RequestBody
-
         if (profileImage == null) {
             attachmentEmpty = RequestBody.create(MediaType.parse("text/plain"), "")
             profileFilePart = MultipartBody.Part.createFormData("attachment", "", attachmentEmpty)
         } else {
-            profileFilePart = MultipartBody.Part.createFormData("image", profileImage!!.name, RequestBody.create(
-                MediaType.parse("car_document/*"), profileImage))
+            profileFilePart = MultipartBody.Part.createFormData("image", profileImage!!.name, RequestBody.create(MediaType.parse("image/*"), profileImage))
         }
 
-        val api = ApiFactory.getClientWithoutHeader(mContext)!!.create(Api::class.java)
-        val call = api.updateDriverCallApi(
-            first_name, last_name, email, mobile, address, lat!!, lon!!, type, id, profileFilePart
-        )
-
-        call.enqueue(object : Callback<ResponseBody> {
-            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                ProjectUtil.pauseProgressDialog()
-                try {
-                    val responseString = response.body()!!.string()
-                    val jsonObject = JSONObject(responseString)
-                    Log.e("driversignup", "responseString = $responseString")
-                    if (jsonObject.getString("status") == "1") {
-                        modelLogin = Gson().fromJson(responseString, ModelLogin::class.java)
-                        sharedPref.setBooleanValue(AppConstant.IS_REGISTER, true)
-                        sharedPref.setUserDetails(AppConstant.USER_DETAILS, modelLogin)
-                        startActivity(Intent(mContext, HomeAct::class.java))
-                        finish()
-                    }
-                } catch (e: java.lang.Exception) {
-                    Toast.makeText(mContext, "Exception = " + e.message, Toast.LENGTH_SHORT).show()
-                    Log.e("Exception", "Exception = " + e.message)
+        if (TextUtils.isEmpty(etFirstName.text.toString().trim())) {
+            MyApplication.showAlert(mContext,getString(R.string.enter_name_firsttext))
+        } else if (TextUtils.isEmpty(etLastName.text.toString().trim())) {
+            MyApplication.showAlert(mContext,getString(R.string.enter_name_lasttext))
+        } else if (TextUtils.isEmpty(etEmail.text.toString().trim())) {
+            MyApplication.showAlert(mContext,getString(R.string.enter_email_text))
+        } else if (TextUtils.isEmpty(etPhone.text.toString().trim())) {
+            MyApplication.showAlert(mContext,getString(R.string.enter_phone_text))
+        } else if (TextUtils.isEmpty(etAdd1.text.toString().trim())) {
+            MyApplication.showAlert(mContext,getString(R.string.enter_address1_text))
+        } else if (!ProjectUtil.isValidEmail(etEmail.text.toString().trim())) {
+            MyApplication.showAlert(mContext,getString(R.string.enter_valid_email))
+        } else {
+            try {
+                lat = latLng!!.latitude.toString()
+                lon = latLng!!.longitude.toString()
+            } catch (e: java.lang.Exception) {
+                lat = ""
+                lon = ""
+            }
+            if (InternetConnection.checkConnection(mContext)) {
+                updateProfileViewModel!!.updateProfileApiCallViewModel(etFirstName.text.toString().trim(),etLastName.text.toString().trim(),etEmail.text.toString().trim(),
+                        etPhone.text.toString().trim(),etAdd1.text.toString().trim(),lat,lon,AppConstant.USER,modelLogin.getResult()!!.id.toString(),profileFilePart
+                    )
                 }
+
+            else {
+                MyApplication.showConnectionDialog(mContext)
+
             }
 
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                ProjectUtil.pauseProgressDialog()
-                Log.e("Exception", "Throwable = " + t.message)
-            }
-
-        })
-
+        }
     }
+
+    private fun setUserDataaa() {
+        etFirstName.setText(modelLogin?.getResult()?.first_name)
+        etLastName.setText(modelLogin?.getResult()?.last_name)
+        etPhone.setText(modelLogin?.getResult()?.mobile)
+        etEmail.setText(modelLogin?.getResult()?.email)
+        etAdd1.setText(modelLogin?.getResult()?.address)
+
+        Log.e(TAG, " User Profile data = " + Gson().toJson(modelLogin))
+
+        Glide.with(mContext).load(modelLogin!!.getResult()?.image)
+            .placeholder(R.drawable.user_ic)
+            .error(R.drawable.user_ic)
+            .into(profileImageSetUpdate)
+    }
+
 
     private fun showPictureDialog() {
         val pictureDialog = AlertDialog.Builder(mContext)
@@ -276,5 +261,6 @@ class UpdateProfileDriverAct : AppCompatActivity() {
         )
         return scaledBitmap
     }
+
 
 }

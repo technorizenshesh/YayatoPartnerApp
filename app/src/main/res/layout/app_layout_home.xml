@@ -78,7 +78,7 @@
             android:textSize="@dimen/_13sdp"
             android:textColor="@color/black"
             android:text="@string/no_booking_available"
-            android:visibility="gone"/>
+            android:visibility="visible"/>
 
 
 

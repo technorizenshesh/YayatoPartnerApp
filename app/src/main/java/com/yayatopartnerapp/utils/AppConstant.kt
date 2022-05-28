@@ -4,7 +4,7 @@ interface AppConstant {
 
     companion object {
 
-        var BASE_URL = "https://technorizen.com/yayato/webservice/"
+        var BASE_URL = "https://technorizen.com/yayato_new/Webservice/"
 
         var TYPE = "type"
         var USER = "USER"

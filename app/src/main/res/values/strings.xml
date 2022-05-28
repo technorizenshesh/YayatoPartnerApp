@@ -147,6 +147,7 @@
     <string name="invalid_email">Invalid Email</string>
     <string name="please_enter_valid_amount">Please enter valid amount</string>
     <string name="no_booking_available">no booking available</string>
+    <string name="login_sucess">Login successfully</string>
     <string-array name="taxi_type">
         <item>Select Vehicle Type</item>
         <item>Bike</item>
@@ -230,5 +231,10 @@
         <item>1971</item>
         <item>1970</item>
     </string-array>
+
+
+    <string name="signup_sucess">Signup Successfully</string>
+    <string name="profile_updated">Profile updated</string>
+    <string name="invalid_input">invalid input</string>
 
 </resources>

@@ -6,11 +6,14 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.yayatopartnerapp.R
 import com.yayatopartnerapp.databinding.ActivityForgotPassBinding
 import com.yayatopartnerapp.utils.InternetConnection
 import com.yayatopartnerapp.utils.MyApplication
 import com.yayatopartnerapp.utils.ProjectUtil
+import com.yayatopartnerapp.viewmodel.ForgotPassViewModel
 import com.yayatotaxi.utils.retrofit.Api
 import com.yayatotaxi.utils.retrofit.ApiFactory
 import kotlinx.android.synthetic.main.activity_forgot_pass.*
@@ -23,20 +26,39 @@ import retrofit2.Response
 class ForgotPassAct : AppCompatActivity() {
 
     var mContext: Context = this@ForgotPassAct
-    lateinit var binding: ActivityForgotPassBinding
+    var forgotPassViewModel : ForgotPassViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this,R.layout.activity_forgot_pass)
-        itit()
+        setContentView(R.layout.activity_forgot_pass)
+        forgotPassViewModel = ViewModelProviders.of(this).get(ForgotPassViewModel::class.java)
+        forgotPassViewModel!!.init(mContext)
+        initViews()
+
+        forgotPassViewModel!!.getForgotPassDataViewModel()!!.observe(this,
+            Observer<ResponseBody?> { response ->
+                if (response != null) {
+                    var stringResponse: String = response.string()
+                    var jsonObject = JSONObject(stringResponse)
+                    if (jsonObject.getString("status") == "1") {
+                        finish()
+                        Toast.makeText(mContext, getString(R.string.reset_pass_msg), Toast.LENGTH_LONG).show()
+                    } else  {
+                        Toast.makeText(mContext, getString(R.string.email_not_found), Toast.LENGTH_LONG).show()
+                    }
+
+                }
+            })
+
+
     }
 
-    private fun itit() {
+    private fun initViews() {
         btSubmit.setOnClickListener {
             if (TextUtils.isEmpty(etEmail.text.toString().trim())) {
                 Toast.makeText(mContext, getString(R.string.enter_email_text), Toast.LENGTH_SHORT).show()
             } else {
-                if (InternetConnection.checkConnection(mContext)) forgotPassApiCall()
+                if (InternetConnection.checkConnection(mContext)) forgotPassViewModel!!.forgotPassApiCallViewModel(etEmail.text.toString().trim())
                 else MyApplication.showConnectionDialog(mContext)
             }
         }
@@ -44,40 +66,6 @@ class ForgotPassAct : AppCompatActivity() {
         ivBack.setOnClickListener {
             finish()
         }
-
-    }
-
-    private fun forgotPassApiCall() {
-        ProjectUtil.showProgressDialog(mContext, false, getString(R.string.please_wait))
-
-        var params: HashMap<String, String> = HashMap()
-        params.put("email", etEmail.text.toString().trim())
-        params.put("type", "USER")
-
-        val api = ApiFactory.getClientWithoutHeader(mContext)?.create(Api::class.java)
-        val call: Call<ResponseBody> = api!!.forgotPass(params)
-        call.enqueue(object : Callback<ResponseBody?> {
-            override fun onResponse(call: Call<ResponseBody?>, response: Response<ResponseBody?>) {
-                ProjectUtil.pauseProgressDialog()
-                try {
-
-                    var stringResponse: String = response.body()!!.string()
-                    var jsonObject = JSONObject(stringResponse)
-
-                    if (jsonObject.getString("status") == "1") {
-                        finish()
-                        Toast.makeText(mContext, getString(R.string.reset_pass_msg), Toast.LENGTH_LONG).show()
-                    } else {
-                        Toast.makeText(mContext, getString(R.string.email_not_found), Toast.LENGTH_LONG).show()
-                    }
-
-                } catch (e: Exception) {}
-            }
-            override fun onFailure(call: Call<ResponseBody?>, t: Throwable) {
-                ProjectUtil.pauseProgressDialog()
-            }
-        })
-
 
     }
 

@@ -11,6 +11,7 @@ import android.text.TextWatcher
 import android.util.Log
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProviders
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -21,6 +22,7 @@ import com.yayatopartnerapp.R
 import com.yayatopartnerapp.databinding.ActivityVerifyBinding
 import com.yayatopartnerapp.models.ModelLogin
 import com.yayatopartnerapp.utils.*
+import com.yayatopartnerapp.viewmodel.SignupViewModel
 import com.yayatotaxi.utils.retrofit.Api
 import com.yayatotaxi.utils.retrofit.ApiFactory
 import kotlinx.android.synthetic.main.activity_verify.*
@@ -48,10 +50,35 @@ class VerifyAct : AppCompatActivity() {
     private var mAuth: FirebaseAuth? = null
     var fileHashMap = HashMap<String, File>()
     var paramHash = HashMap<String, String>()
+    var signupViewModel : SignupViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        signupViewModel = ViewModelProviders.of(this).get(SignupViewModel::class.java)
+        signupViewModel!!.init(mContext)
         binding = DataBindingUtil.setContentView(this,R.layout.activity_verify)
+
+
+        signupViewModel!!.getSignupDataViewModel()!!.observe(this,{
+            if (it != null) {
+                modelLogin =  it;
+                Toast.makeText(mContext,R.string.signup_sucess,Toast.LENGTH_LONG)
+                sharedPref.setBooleanValue(AppConstant.IS_REGISTER, true)
+                sharedPref.setUserDetails(AppConstant.USER_DETAILS, modelLogin)
+                startActivity(Intent(mContext, HomeAct::class.java))
+                finish()
+
+            } else {
+                MyApplication.showAlert(mContext, modelLogin.getMessage()!!)
+
+            }
+        })
+
+        itit()
+
+    }
+
+    private fun itit() {
 
         sharedPref = SharedPref(mContext)
         mAuth = FirebaseAuth.getInstance()
@@ -63,11 +90,6 @@ class VerifyAct : AppCompatActivity() {
         if (InternetConnection.checkConnection(mContext)) sendVerificationCode()
         else MyApplication.showConnectionDialog(mContext)
 
-        itit()
-
-    }
-
-    private fun itit() {
 
         ivBack.setOnClickListener { finish() }
 
@@ -190,75 +212,20 @@ class VerifyAct : AppCompatActivity() {
                     // Toast.makeText(mContext, "success", Toast.LENGTH_SHORT).show();
                     // Sign in success, update UI with the signed-in user's information
                     val user = task.result.user
-                    signupCallApi()
+                    if (InternetConnection.checkConnection(mContext)) signupViewModel!!.signupApiCallViewModel(paramHash["first_name"]!!,paramHash["last_name"]!!
+                        ,paramHash["email"]!!,paramHash["mobile"]!!,paramHash["address"]!!,paramHash["register_id"]!!,paramHash["lat"]!!
+                        , paramHash["lon"]!!,paramHash["password"]!!,paramHash["type"]!!,"1",fileHashMap["image"]!!)
+                    else MyApplication.showConnectionDialog(mContext)
                 } else {
                     ProjectUtil.pauseProgressDialog()
                     Toast.makeText(mContext, "Failed", Toast.LENGTH_SHORT).show()
                     if (task.exception is FirebaseAuthInvalidCredentialsException) {
+                        task.exception
                     }
                 }
             }
     }
 
-    private fun signupCallApi() {
-        ProjectUtil.showProgressDialog(mContext, false, getString(R.string.please_wait))
-        val profileFilePart: MultipartBody.Part
-
-        val first_name = RequestBody.create(MediaType.parse("text/plain"), paramHash["first_name"])
-
-        val last_name = RequestBody.create(MediaType.parse("text/plain"), paramHash["last_name"])
-        val email = RequestBody.create(MediaType.parse("text/plain"), paramHash["email"])
-        val mobile = RequestBody.create(MediaType.parse("text/plain"), paramHash["mobile"])
-        val city = RequestBody.create(MediaType.parse("text/plain"), paramHash["city"])
-        val address = RequestBody.create(MediaType.parse("text/plain"), paramHash["address"])
-        val register_id = RequestBody.create(MediaType.parse("text/plain"), paramHash["register_id"])
-        val lat = RequestBody.create(MediaType.parse("text/plain"), paramHash["lat"])
-        val lon = RequestBody.create(MediaType.parse("text/plain"), paramHash["lon"])
-        val password = RequestBody.create(MediaType.parse("text/plain"), paramHash["password"])
-        val type = RequestBody.create(MediaType.parse("text/plain"), paramHash["type"])
-        val step = RequestBody.create(MediaType.parse("text/plain"), "1")
-
-        profileFilePart = MultipartBody.Part.createFormData(
-            "image", fileHashMap["image"]!!.name,
-            RequestBody.create(MediaType.parse("car_document/*"), fileHashMap["image"])
-        )
-
-        val api: Api = ApiFactory.getClientWithoutHeader(mContext)!!.create(Api::class.java)
-        val call: Call<ResponseBody> = api.signUpDriverCallApi(
-            first_name, last_name, email, mobile,
-            address, register_id, lat, lon, password, type, step, profileFilePart
-        )
-
-        call.enqueue(object : Callback<ResponseBody> {
-            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                ProjectUtil.pauseProgressDialog()
-                try {
-                    val responseString = response.body()!!.string()
-                    val jsonObject = JSONObject(responseString)
-                    Log.e("driversignup", "responseString = $responseString")
-                    if (jsonObject.getString("status") == "1") {
-                        modelLogin = Gson().fromJson(responseString, ModelLogin::class.java)
-                        sharedPref.setBooleanValue(AppConstant.IS_REGISTER, true)
-                        sharedPref.setUserDetails(AppConstant.USER_DETAILS, modelLogin)
-                        startActivity(Intent(mContext, UploadDocAct::class.java))
-                        finish()
-                    } else {
-                        MyApplication.showAlert(mContext, getString(R.string.user_already_exits))
-                    }
-                } catch (e: Exception) {
-                    Toast.makeText(mContext, "Exception = " + e.message, Toast.LENGTH_SHORT).show()
-                    Log.e("Exception", "Exception = " + e.message)
-                }
-            }
-
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                ProjectUtil.pauseProgressDialog()
-                Log.e("Exception", "Throwable = " + t.message)
-            }
-
-        })
-
-    }
 
 
 }

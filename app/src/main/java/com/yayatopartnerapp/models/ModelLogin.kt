@@ -85,6 +85,9 @@ class ModelLogin : Serializable {
         var distance: String? = null
         var step: String? = null
         var brand: String? = null
+
+
+
     }
 
 }

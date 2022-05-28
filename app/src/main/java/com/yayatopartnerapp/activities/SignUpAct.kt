@@ -23,55 +23,44 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.yayatopartnerapp.R
 import com.yayatopartnerapp.databinding.ActivitySignUpBinding
 import com.yayatopartnerapp.models.ModelLogin
-import com.yayatopartnerapp.utils.MyApplication
-import com.yayatopartnerapp.utils.ProjectUtil
+import com.yayatopartnerapp.utils.*
 import com.yayatopartnerapp.utils.ProjectUtil.Companion.getImageUri
-import com.yayatopartnerapp.utils.RealPathUtil
-import com.yayatopartnerapp.utils.SharedPref
 import kotlinx.android.synthetic.main.activity_sign_up.*
 import java.io.File
 import java.util.*
 
-class SignUpAct : AppCompatActivity() {
-
+class SignUpAct: AppCompatActivity() {
+    var TAG = "SignUpAct"
     var mContext: Context = this@SignUpAct
-    lateinit var binding: ActivitySignUpBinding
-    private var PERMISSION_ID: Int = 1001
     private var AUTOCOMPLETE_REQUEST_CODE: Int = 101
-    private val GALLERY = 0
-    private val CAMERA = 1
+    private val GALLERY = 0;
+    private val CAMERA = 1;
     lateinit var registerId: String
     var sharedPref: SharedPref? = null
     var modelLogin: ModelLogin? = null
     var profileImage: File? = null
-    private var str_image_path: String? = null
     private var latLng: LatLng? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_sign_up)
+        setContentView(R.layout.activity_sign_up)
         sharedPref = SharedPref(mContext)
-        // setting up the flag programmatically so that the
-        // device screen should be always on
+        initViews()
+    }
 
-        // setting up the flag programmatically so that the
-        // device screen should be always on
+    private fun initViews() {
+        sharedPref = SharedPref(mContext)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         FirebaseMessaging.getInstance().token.addOnSuccessListener { token: String ->
             if (!TextUtils.isEmpty(token)) {
                 registerId = token
-                Log.e("tokentoken", "retrieve token successful : $token")
+                Log.e(TAG, "retrieve token successful : $token")
             } else {
-                Log.e("tokentoken", "token should not be null...")
+                Log.e(TAG, "token should not be null...")
             }
         }
 
-        itit()
-
-    }
-
-    private fun itit() {
 
         ivBack.setOnClickListener { finish() }
 
@@ -95,64 +84,67 @@ class SignUpAct : AppCompatActivity() {
             }
         }
 
-        tvTerms.setOnClickListener {
-            startActivity(Intent(mContext, TermsConditionAct::class.java))
-        }
-
         btnSignUp.setOnClickListener {
-            if (TextUtils.isEmpty(etFirstName.text.toString().trim())) {
-                MyApplication.showAlert(mContext, getString(R.string.enter_name_firsttext))
-            } else if (TextUtils.isEmpty(etLastName.text.toString().trim())) {
-                MyApplication.showAlert(mContext, getString(R.string.enter_name_lasttext))
-            } else if (TextUtils.isEmpty(etEmail.text.toString().trim())) {
-                MyApplication.showAlert(mContext, getString(R.string.enter_email_text))
-            } else if (TextUtils.isEmpty(etPhone.text.toString().trim())) {
-                MyApplication.showAlert(mContext, getString(R.string.enter_phone_text))
-            } else if (TextUtils.isEmpty(etAdd1.text.toString().trim())) {
-                MyApplication.showAlert(mContext, getString(R.string.enter_address1_text))
-            } else if (!ProjectUtil.isValidEmail(etEmail.text.toString().trim())) {
-                MyApplication.showAlert(mContext, getString(R.string.enter_valid_email))
-            } else if (TextUtils.isEmpty(etPassword.text.toString().trim())) {
-                MyApplication.showAlert(mContext, getString(R.string.please_enter_pass))
-            } else if (etPassword.text.toString().trim().length < 4) {
-                MyApplication.showAlert(mContext, getString(R.string.password_validation_text))
-            } else if (profileImage == null) {
-                MyApplication.showAlert(mContext, getString(R.string.please_upload_profile))
-            } else if (!cbAcceptTerms.isChecked) {
-                MyApplication.showAlert(mContext, getString(R.string.please_accept_term_con))
-            } else {
-                val params = HashMap<String, String>()
-                val fileHashMap = HashMap<String, File>()
-                params["first_name"] = etFirstName.text.toString().trim()
-                params["last_name"] = etLastName.text.toString().trim()
-                params["email"] = etEmail.text.toString().trim()
-                params["mobile"] = etPhone.text.toString().trim()
-                params["city"] = etCityName.text.toString().trim()
-                params["address"] = etAdd1.text.toString().trim()
-                params["register_id"] = registerId
-                params["lat"] = latLng!!.latitude.toString()
-                params["lon"] = latLng!!.longitude.toString()
-                params["password"] = etPassword.text.toString().trim()
-                params["type"] = "PARTNER"
-                fileHashMap["image"] = profileImage!!
-
-                Log.e("signupDriver", "signupDriver = $params")
-                Log.e("signupDriver", "fileHashMap = $fileHashMap")
-
-                val mobileNumber = "+237" + etPhone.text.toString().trim()
-             //    val mobileNumber = "+91" + etPhone.text.toString().trim()
-
-                startActivity(Intent(mContext, VerifyAct::class.java)
-                        .putExtra("resgisterHashmap", params)
-                        .putExtra("mobile", mobileNumber)
-                        .putExtra("fileHashMap", fileHashMap)
-                )
-
-            }
-
+            validation()
         }
+
+
 
     }
+
+    private fun validation() {
+        if (TextUtils.isEmpty(etFirstName.text.toString().trim())) {
+            MyApplication.showAlert(mContext, getString(R.string.enter_name_firsttext))
+        } else if (TextUtils.isEmpty(etLastName.text.toString().trim())) {
+            MyApplication.showAlert(mContext, getString(R.string.enter_name_lasttext))
+        } else if (TextUtils.isEmpty(etEmail.text.toString().trim())) {
+            MyApplication.showAlert(mContext, getString(R.string.enter_email_text))
+        } else if (TextUtils.isEmpty(etPhone.text.toString().trim())) {
+            MyApplication.showAlert(mContext, getString(R.string.enter_phone_text))
+        } else if (TextUtils.isEmpty(etAdd1.text.toString().trim())) {
+            MyApplication.showAlert(mContext, getString(R.string.enter_address1_text))
+        } else if (!ProjectUtil.isValidEmail(etEmail.text.toString().trim())) {
+            MyApplication.showAlert(mContext, getString(R.string.enter_valid_email))
+        } else if (TextUtils.isEmpty(etPassword.text.toString().trim())) {
+            MyApplication.showAlert(mContext, getString(R.string.please_enter_pass))
+        } else if (etPassword.text.toString().trim().length < 4) {
+            MyApplication.showAlert(mContext, getString(R.string.password_validation_text))
+        } else if (profileImage == null) {
+            MyApplication.showAlert(mContext, getString(R.string.please_upload_profile))
+        } else if (!cbAcceptTerms.isChecked) {
+            MyApplication.showAlert(mContext, getString(R.string.please_accept_term_con))
+        } else {
+            val params = HashMap<String, String>()
+            val fileHashMap = HashMap<String, File>()
+            params["first_name"] = etFirstName.text.toString().trim()
+            params["last_name"] = etLastName.text.toString().trim()
+            params["email"] = etEmail.text.toString().trim()
+            params["mobile"] = etPhone.text.toString().trim()
+            params["city"] = etCityName.text.toString().trim()
+            params["address"] = etAdd1.text.toString().trim()
+            params["register_id"] = registerId
+            params["lat"] = latLng!!.latitude.toString()
+            params["lon"] = latLng!!.longitude.toString()
+            params["password"] = etPassword.text.toString().trim()
+            params["type"] = AppConstant.PARTNER
+            fileHashMap["image"] = profileImage!!
+
+            Log.e(TAG, "signupUser = $params")
+            Log.e(TAG, "fileHashMap = $fileHashMap")
+
+           // val mobileNumber = "+237" + etPhone.text.toString().trim()
+                val mobileNumber = "+91"  + etPhone.text.toString().trim()
+
+            startActivity(
+                Intent(mContext, VerifyAct::class.java)
+                    .putExtra("resgisterHashmap", params)
+                    .putExtra("mobile", mobileNumber)
+                    .putExtra("fileHashMap", fileHashMap)
+            )
+
+        }
+    }
+
 
     private fun showPictureDialog() {
         val pictureDialog = AlertDialog.Builder(mContext)
@@ -208,7 +200,7 @@ class SignUpAct : AppCompatActivity() {
                         val bitmapNew = extras!!["data"] as Bitmap
                         val imageBitmap: Bitmap =
                             BITMAP_RE_SIZER(bitmapNew, bitmapNew!!.width, bitmapNew!!.height)!!
-                        val tempUri: Uri = getImageUri(mContext, imageBitmap)!!
+                        val tempUri: Uri = ProjectUtil.getImageUri(mContext, imageBitmap)!!
                         val image = RealPathUtil.getRealPath(mContext, tempUri)
                         profileImage = File(image)
                         Log.e("sgfsfdsfs", "profileImage = $profileImage")
@@ -239,5 +231,6 @@ class SignUpAct : AppCompatActivity() {
         )
         return scaledBitmap
     }
+
 
 }

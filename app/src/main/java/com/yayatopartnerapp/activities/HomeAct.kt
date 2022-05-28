@@ -49,7 +49,7 @@ class HomeAct : AppCompatActivity() {
     private fun itit() {
 
         binding.childNavDrawer.btnEditProfile.setOnClickListener {
-            startActivity(Intent(mContext, UpdateProfileDriverAct::class.java))
+            startActivity(Intent(mContext, UpdateProfielAct::class.java))
             binding.drawerLayout.closeDrawer(GravityCompat.START)
         }
 
@@ -71,6 +71,7 @@ class HomeAct : AppCompatActivity() {
             ProjectUtil.logoutAppDialog(mContext)
         }
 
+/*
         binding.chlidDashboard.btnUploadedVehicles.setOnClickListener {
             startActivity(Intent(mContext, AddVehicalOnRentActivity::class.java))
         }
@@ -85,6 +86,7 @@ class HomeAct : AppCompatActivity() {
 
             binding.drawerLayout.closeDrawer(GravityCompat.START)
         }
+*/
 
     }
 
@@ -101,7 +103,7 @@ class HomeAct : AppCompatActivity() {
         Log.e("sfasdasdas","modelLogin.getResult()?.image = " + modelLogin.getResult()?.image)
 
 
-        get_all_vehicleApi()
+        //get_all_vehicleApi()
     }
 
 

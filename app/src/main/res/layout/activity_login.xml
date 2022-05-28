@@ -3,6 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="loginViewModel"
+            type="com.yayatopartnerapp.viewmodel.LoginViewModel" />
+
+    </data>
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -87,6 +95,7 @@
                                     android:backgroundTint="@color/white"
                                     android:fontFamily="@font/poppins_medium"
                                     android:imeOptions="actionNext"
+                                    android:text="@={loginViewModel.email}"
                                     android:inputType="textVisiblePassword"
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/_12sdp" />
@@ -120,6 +129,7 @@
                                 android:backgroundTint="@color/white"
                                 android:fontFamily="@font/poppins_medium"
                                 android:imeOptions="actionDone"
+                                android:text="@={loginViewModel.password}"
                                 android:inputType="textPassword"
                                 android:textColor="@color/black"
                                 android:textSize="@dimen/_12sdp" />
@@ -133,6 +143,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"
+                        android:onClick="@{()->loginViewModel.forgotClick(rlForgotPass)}"
                         android:layout_marginTop="@dimen/_5sdp">
 
                         <TextView
@@ -167,6 +178,7 @@
                         android:fontFamily="@font/poppins_medium"
                         android:padding="@dimen/_10sdp"
                         android:text="@string/login"
+                        android:onClick="@{()->loginViewModel.validation()}"
                         android:textAllCaps="false"
                         android:textColor="@color/white"
                         android:textSize="@dimen/_16sdp" />
@@ -176,12 +188,13 @@
             </LinearLayout>
 
             <RelativeLayout
-                android:id="@+id/rl_link_signup"
+                android:id="@+id/btnSignup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/bottom_white_line"
                 android:layout_centerHorizontal="true"
                 android:layout_gravity="center_horizontal"
+                android:onClick="@{()->loginViewModel.signupClick(btnSignup)}"
                 android:paddingLeft="@dimen/_10sdp">
 
                 <TextView
