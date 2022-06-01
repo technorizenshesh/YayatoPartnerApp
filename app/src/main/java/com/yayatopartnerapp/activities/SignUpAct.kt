@@ -132,8 +132,8 @@ class SignUpAct: AppCompatActivity() {
             Log.e(TAG, "signupUser = $params")
             Log.e(TAG, "fileHashMap = $fileHashMap")
 
-           // val mobileNumber = "+237" + etPhone.text.toString().trim()
-                val mobileNumber = "+91"  + etPhone.text.toString().trim()
+            val mobileNumber = "+237" + etPhone.text.toString().trim()
+             //   val mobileNumber = "+91"  + etPhone.text.toString().trim()
 
             startActivity(
                 Intent(mContext, VerifyAct::class.java)
