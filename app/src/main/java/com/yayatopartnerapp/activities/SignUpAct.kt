@@ -25,6 +25,8 @@ import com.yayatopartnerapp.databinding.ActivitySignUpBinding
 import com.yayatopartnerapp.models.ModelLogin
 import com.yayatopartnerapp.utils.*
 import com.yayatopartnerapp.utils.ProjectUtil.Companion.getImageUri
+import com.yayatopartnerapp.viewmodel.LoginViewModel
+import com.yayatopartnerapp.viewmodel.SignupMainViewModel
 import kotlinx.android.synthetic.main.activity_sign_up.*
 import java.io.File
 import java.util.*
@@ -32,6 +34,7 @@ import java.util.*
 class SignUpAct: AppCompatActivity() {
     var TAG = "SignUpAct"
     var mContext: Context = this@SignUpAct
+    lateinit var binding: ActivitySignUpBinding
     private var AUTOCOMPLETE_REQUEST_CODE: Int = 101
     private val GALLERY = 0;
     private val CAMERA = 1;
@@ -40,10 +43,13 @@ class SignUpAct: AppCompatActivity() {
     var modelLogin: ModelLogin? = null
     var profileImage: File? = null
     private var latLng: LatLng? = null
+    var signupViewModel: SignupMainViewModel? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sign_up)
+        binding =  DataBindingUtil.setContentView(this,R.layout.activity_sign_up)
+     //   binding.signupViewModel = signupViewModel
         sharedPref = SharedPref(mContext)
         initViews()
     }
@@ -132,8 +138,8 @@ class SignUpAct: AppCompatActivity() {
             Log.e(TAG, "signupUser = $params")
             Log.e(TAG, "fileHashMap = $fileHashMap")
 
-            val mobileNumber = "+237" + etPhone.text.toString().trim()
-             //   val mobileNumber = "+91"  + etPhone.text.toString().trim()
+            //val mobileNumber = "+237" + etPhone.text.toString().trim()
+                val mobileNumber = "+91"  + etPhone.text.toString().trim()
 
             startActivity(
                 Intent(mContext, VerifyAct::class.java)

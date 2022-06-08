@@ -13,10 +13,14 @@ class ApiFactory {
 
     companion object {
         var BASE_URL: String = AppConstant.BASE_URL
+        var BASE_URL2: String = AppConstant.BASE_URL11
+
+
         private var retrofit: Retrofit? = null
         private val httpClient = OkHttpClient.Builder()
 
         fun getClientWithoutHeader(context: Context): Retrofit? {
+            retrofit = null
             val interceptor = HttpLoggingInterceptor()
             interceptor.level = HttpLoggingInterceptor.Level.BODY
             val client = httpClient.addInterceptor(interceptor)
@@ -33,6 +37,27 @@ class ApiFactory {
             }
             return retrofit
         }
+
+
+        fun getClientWithoutHeader11(context: Context): Retrofit? {
+            retrofit = null
+            val interceptor = HttpLoggingInterceptor()
+            interceptor.level = HttpLoggingInterceptor.Level.BODY
+            val client = httpClient.addInterceptor(interceptor)
+                .connectTimeout(5, TimeUnit.MINUTES)
+                .readTimeout(120, TimeUnit.SECONDS)
+                .writeTimeout(120, TimeUnit.SECONDS)
+                .build()
+            if (retrofit == null) {
+                retrofit = Retrofit.Builder()
+                    .baseUrl(BASE_URL2)
+                    .client(client)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+            }
+            return retrofit
+        }
+
     }
 
 }

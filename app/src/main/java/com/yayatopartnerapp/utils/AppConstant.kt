@@ -1,10 +1,19 @@
 package com.yayatopartnerapp.utils
 
+import android.net.Uri
+import androidx.databinding.BindingAdapter
+import com.bumptech.glide.Glide
+import de.hdodenhof.circleimageview.CircleImageView
+import kotlinx.android.synthetic.main.activity_sign_up.*
+
 interface AppConstant {
 
     companion object {
 
         var BASE_URL = "https://technorizen.com/yayato_new/Webservice/"
+
+        var BASE_URL11 = "https://technorizen.com/yayato/Webservice/"
+
 
         var TYPE = "type"
         var USER = "USER"
@@ -42,6 +51,24 @@ interface AppConstant {
         var TAXI_DRIVER = "TAXI_DRIVER"
         var LAST = "last"
 
+    }
+
+
+    object DataBindingAdapters {
+
+        @BindingAdapter("imageSrc")
+        @JvmStatic
+        fun setImageResource(imageView: CircleImageView, resource: String) {
+           // imageView.setImageResource(resource)
+            imageView.setImageURI(Uri.parse(resource))
+
+        }
+
+      /*  @BindingAdapter("visible")
+        @JvmStatic
+        fun View.setVisible(show: Boolean) {
+            visibility = if (show) VISIBLE else GONE
+        }*/
     }
 
 }

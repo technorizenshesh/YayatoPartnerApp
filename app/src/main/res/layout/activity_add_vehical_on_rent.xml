@@ -3,6 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+
+    <!--<data>
+
+        <variable
+            name="addVehicleViewModel"
+            type="com.yayatopartnerapp.viewmodel.AddVehicleViewModel" />
+    </data>-->
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -55,11 +63,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_100sdp"
                 android:layout_marginLeft="@dimen/_25sdp"
-                android:scaleType="fitXY"
-                android:visibility="gone"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:layout_marginRight="@dimen/_25sdp"
-                android:src="@drawable/add_vehicle_img"/>
+                android:scaleType="fitXY"
+                android:src="@drawable/add_vehicle_img"
+                android:visibility="gone" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -103,19 +111,19 @@
                 android:layout_centerInParent="true"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_10sdp"
-                android:visibility="gone"
                 android:fontFamily="@font/inter_semi_bold"
                 android:text="@string/select_vehicle_model"
                 android:textColor="@color/textColor"
-                android:textSize="@dimen/_12sdp" />
+                android:textSize="@dimen/_12sdp"
+                android:visibility="gone" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_5sdp"
-                android:visibility="gone"
                 android:layout_marginRight="@dimen/_10sdp"
+                android:visibility="gone"
                 app:cardCornerRadius="@dimen/_5sdp"
                 app:cardElevation="@dimen/_5sdp">
 
@@ -138,21 +146,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:visibility="gone"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:fontFamily="@font/inter_semi_bold"
                 android:text="@string/select_vehicle_brand"
                 android:textColor="@color/textColor"
-                android:textSize="@dimen/_12sdp" />
+                android:textSize="@dimen/_12sdp"
+                android:visibility="gone" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_5sdp"
-                android:visibility="gone"
                 android:layout_marginRight="@dimen/_10sdp"
+                android:visibility="gone"
                 app:cardCornerRadius="@dimen/_5sdp"
                 app:cardElevation="@dimen/_5sdp">
 
@@ -175,9 +183,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/_10sdp"
-                android:visibility="gone"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:layout_marginRight="@dimen/_10sdp"
+                android:visibility="gone"
                 app:cardCornerRadius="@dimen/_5sdp"
                 app:cardElevation="@dimen/_5sdp">
 
@@ -234,6 +242,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
             </androidx.cardview.widget.CardView>
+
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -245,6 +254,7 @@
                 android:visibility="gone"
                 app:cardCornerRadius="@dimen/_5sdp"
                 app:cardElevation="@dimen/_5sdp">
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -277,8 +287,8 @@
                 android:layout_centerInParent="true"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_10sdp"
-                android:fontFamily="@font/inter_semi_bold"
                 android:layout_marginRight="@dimen/_10sdp"
+                android:fontFamily="@font/inter_semi_bold"
                 android:text="@string/select_time_when_you_want_your_vehicle_for_service"
                 android:textColor="@color/textColor"
                 android:textSize="@dimen/_12sdp" />
@@ -290,14 +300,24 @@
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
-                    android:layout_weight="0.5"
                     android:layout_height="wrap_content"
-                    android:background="@color/white"
                     android:layout_margin="@dimen/_10sdp"
-                    app:cardCornerRadius="@dimen/_10sdp"
-                    app:cardElevation="@dimen/_5sdp"
                     android:layout_marginTop="@dimen/_10sdp"
-                    android:elevation="@dimen/_5sdp">
+                    android:layout_weight="0.5"
+                    android:background="@color/white"
+                    android:elevation="@dimen/_5sdp"
+                    app:cardCornerRadius="@dimen/_10sdp"
+                    app:cardElevation="@dimen/_5sdp">
+
+<!--
+                    android:text="@{addVehicleViewModel.getStartDate}"
+-->
+
+<!--
+                    android:onClick="@{(view)->addVehicleViewModel.onStartDateClick(view)}"
+-->
+
+
 
                     <EditText
                         android:id="@+id/etStartDate"
@@ -320,14 +340,14 @@
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
-                    android:layout_weight="0.5"
                     android:layout_height="wrap_content"
-                    android:background="@color/white"
-                    android:layout_marginRight="@dimen/_10sdp"
-                    app:cardCornerRadius="@dimen/_10sdp"
-                    app:cardElevation="@dimen/_5sdp"
                     android:layout_marginTop="@dimen/_10sdp"
-                    android:elevation="@dimen/_5sdp">
+                    android:layout_marginRight="@dimen/_10sdp"
+                    android:layout_weight="0.5"
+                    android:background="@color/white"
+                    android:elevation="@dimen/_5sdp"
+                    app:cardCornerRadius="@dimen/_10sdp"
+                    app:cardElevation="@dimen/_5sdp">
 
                     <EditText
                         android:id="@+id/etEndDate"
@@ -357,14 +377,14 @@
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
-                    android:layout_weight="0.5"
                     android:layout_height="wrap_content"
-                    android:background="@color/white"
                     android:layout_margin="@dimen/_10sdp"
-                    app:cardCornerRadius="@dimen/_10sdp"
-                    app:cardElevation="@dimen/_5sdp"
                     android:layout_marginTop="@dimen/_10sdp"
-                    android:elevation="@dimen/_5sdp">
+                    android:layout_weight="0.5"
+                    android:background="@color/white"
+                    android:elevation="@dimen/_5sdp"
+                    app:cardCornerRadius="@dimen/_10sdp"
+                    app:cardElevation="@dimen/_5sdp">
 
                     <EditText
                         android:id="@+id/etStartTime"
@@ -387,14 +407,14 @@
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
-                    android:layout_weight="0.5"
                     android:layout_height="wrap_content"
-                    android:background="@color/white"
-                    android:layout_marginRight="@dimen/_10sdp"
-                    app:cardCornerRadius="@dimen/_10sdp"
-                    app:cardElevation="@dimen/_5sdp"
                     android:layout_marginTop="@dimen/_10sdp"
-                    android:elevation="@dimen/_5sdp">
+                    android:layout_marginRight="@dimen/_10sdp"
+                    android:layout_weight="0.5"
+                    android:background="@color/white"
+                    android:elevation="@dimen/_5sdp"
+                    app:cardCornerRadius="@dimen/_10sdp"
+                    app:cardElevation="@dimen/_5sdp">
 
                     <EditText
                         android:id="@+id/etEndTime"
@@ -422,12 +442,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
+                android:layout_margin="@dimen/_15sdp"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:layout_marginBottom="@dimen/_5sdp"
                 android:background="@drawable/login_bt_back"
                 android:fontFamily="@font/poppins_medium"
                 android:padding="@dimen/_10sdp"
-                android:layout_margin="@dimen/_15sdp"
                 android:text="@string/submit"
                 android:textAllCaps="false"
                 android:textColor="@color/white"

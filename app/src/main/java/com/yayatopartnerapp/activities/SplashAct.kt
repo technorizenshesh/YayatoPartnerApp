@@ -99,13 +99,13 @@ class SplashAct : AppCompatActivity() {
         Handler(Looper.getMainLooper()).postDelayed({
             if (sharedPref.getBooleanValue(AppConstant.IS_REGISTER)) {
                 modelLogin = sharedPref.getUserDetails(AppConstant.USER_DETAILS)
-                if (modelLogin.getResult()!!.step.equals("1")) {
-                    startActivity(Intent(mContext, UploadDocAct::class.java))
+              /*  if (modelLogin.getResult()!!.step.equals("1")) {
+                  //  startActivity(Intent(mContext, UploadDocAct::class.java))
                     finish()
-                } else if (modelLogin.getResult()!!.step.equals("2")) {
+               // }  if (modelLogin.getResult()!!.step.equals("2")) {else*/
                     startActivity(Intent(mContext, HomeAct::class.java))
                     finish()
-                }
+
             } else {
                 startActivity(Intent(mContext, LoginAct::class.java))
                 finish()

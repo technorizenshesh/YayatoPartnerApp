@@ -1,7 +1,7 @@
 package com.yayatopartnerapp.activities
-
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -12,6 +12,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.google.android.gms.auth.api.phone.SmsRetriever
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -38,10 +40,11 @@ import java.io.File
 import java.util.HashMap
 import java.util.concurrent.TimeUnit
 
-class VerifyAct : AppCompatActivity() {
+class VerifyAct : AppCompatActivity(), MySMSBroadcastReceiver.OTPReceiveListener {
+
+    private var smsReceiver: MySMSBroadcastReceiver? = null
 
     var mContext: Context = this@VerifyAct
-    lateinit var binding: ActivityVerifyBinding
     var type = ""
     var mobile = ""
     var id: String? = null
@@ -52,11 +55,14 @@ class VerifyAct : AppCompatActivity() {
     var paramHash = HashMap<String, String>()
     var signupViewModel : SignupViewModel? = null
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_verify)
         signupViewModel = ViewModelProviders.of(this).get(SignupViewModel::class.java)
         signupViewModel!!.init(mContext)
-        binding = DataBindingUtil.setContentView(this,R.layout.activity_verify)
+        initViews()
+
 
 
         signupViewModel!!.getSignupDataViewModel()!!.observe(this,{
@@ -74,12 +80,9 @@ class VerifyAct : AppCompatActivity() {
             }
         })
 
-        itit()
-
     }
 
-    private fun itit() {
-
+    private fun initViews() {
         sharedPref = SharedPref(mContext)
         mAuth = FirebaseAuth.getInstance()
 
@@ -87,8 +90,19 @@ class VerifyAct : AppCompatActivity() {
         paramHash = intent.getSerializableExtra("resgisterHashmap") as HashMap<String, String>
         fileHashMap = intent.getSerializableExtra("fileHashMap") as HashMap<String, File>
 
-        if (InternetConnection.checkConnection(mContext)) sendVerificationCode()
-        else MyApplication.showConnectionDialog(mContext)
+        if (InternetConnection.checkConnection(mContext)) {
+          try {
+              sendVerificationCode()
+
+          }catch (e: Exception){
+              e.printStackTrace()
+          }
+        } else {
+            MyApplication.showConnectionDialog(mContext)
+        }
+
+
+      //  startSMSListener()
 
 
         ivBack.setOnClickListener { finish() }
@@ -98,6 +112,7 @@ class VerifyAct : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 et2.requestFocus()
             }
+
             override fun afterTextChanged(s: Editable) {}
         })
 
@@ -138,32 +153,95 @@ class VerifyAct : AppCompatActivity() {
         })
 
         btn_verify.setOnClickListener {
-            if (TextUtils.isEmpty(et1.text.toString().trim())) {
-                Toast.makeText(mContext, getString(R.string.invalid_otp), Toast.LENGTH_SHORT).show()
-            } else if (TextUtils.isEmpty(et2.text.toString().trim())) {
-                Toast.makeText(mContext, getString(R.string.invalid_otp), Toast.LENGTH_SHORT).show()
-            } else if (TextUtils.isEmpty(et3.text.toString().trim())) {
-                Toast.makeText(mContext, getString(R.string.invalid_otp), Toast.LENGTH_SHORT).show()
-            } else if (TextUtils.isEmpty(et4.text.toString().trim())) {
-                Toast.makeText(mContext, getString(R.string.invalid_otp), Toast.LENGTH_SHORT).show()
-            } else if (TextUtils.isEmpty(et5.text.toString().trim())) {
-                Toast.makeText(mContext, getString(R.string.invalid_otp), Toast.LENGTH_SHORT).show()
-            } else if (TextUtils.isEmpty(et6.text.toString().trim())) {
-                Toast.makeText(mContext, getString(R.string.invalid_otp), Toast.LENGTH_SHORT).show()
-            } else {
-                val otpFull: String = et1.text.toString().trim() +
-                        et2.text.toString().trim() +
-                        et3.text.toString().trim() +
-                        et4.text.toString().trim() +
-                        et5.text.toString().trim() +
-                        et6.text.toString().trim()
-                ProjectUtil.showProgressDialog(mContext, true, getString(R.string.please_wait))
-                val credential = PhoneAuthProvider.getCredential(id!!, otpFull)
-                signInWithPhoneAuthCredential(credential)
-            }
+            validation()
         }
 
     }
+
+    private fun validation() {
+        if (TextUtils.isEmpty(et1.text.toString().trim())) {
+            Toast.makeText(mContext, getString(R.string.invalid_otp), Toast.LENGTH_SHORT).show()
+        } else if (TextUtils.isEmpty(et2.text.toString().trim())) {
+            Toast.makeText(mContext, getString(R.string.invalid_otp), Toast.LENGTH_SHORT).show()
+        } else if (TextUtils.isEmpty(et3.text.toString().trim())) {
+            Toast.makeText(mContext, getString(R.string.invalid_otp), Toast.LENGTH_SHORT).show()
+        } else if (TextUtils.isEmpty(et4.text.toString().trim())) {
+            Toast.makeText(mContext, getString(R.string.invalid_otp), Toast.LENGTH_SHORT).show()
+        } else if (TextUtils.isEmpty(et5.text.toString().trim())) {
+            Toast.makeText(mContext, getString(R.string.invalid_otp), Toast.LENGTH_SHORT).show()
+        } else if (TextUtils.isEmpty(et6.text.toString().trim())) {
+            Toast.makeText(mContext, getString(R.string.invalid_otp), Toast.LENGTH_SHORT).show()
+        } else {
+            val otpFull: String = et1.text.toString().trim() +
+                    et2.text.toString().trim() +
+                    et3.text.toString().trim() +
+                    et4.text.toString().trim() +
+                    et5.text.toString().trim() +
+                    et6.text.toString().trim()
+            ProjectUtil.showProgressDialog(mContext, true, getString(R.string.please_wait))
+            val credential = PhoneAuthProvider.getCredential(id!!, otpFull)
+            signInWithPhoneAuthCredential(credential)
+        }
+    }
+
+
+
+
+
+    override fun onOTPReceived(otp: String) {
+        showToast("OTP Received: " + otp)
+//        editText.setText(otp)
+        if (smsReceiver != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(smsReceiver!!)
+        }
+    }
+
+    override fun onOTPTimeOut() {
+        showToast("OTP Time out")
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (smsReceiver != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(smsReceiver!!)
+        }
+    }
+    private fun showToast(msg: String) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+    }
+    /**
+     * Starts SmsRetriever, which waits for ONE matching SMS message until timeout
+     * (5 minutes). The matching SMS message will be sent via a Broadcast Intent with
+     * action SmsRetriever#SMS_RETRIEVED_ACTION.
+     */
+    private fun startSMSListener() {
+        try {
+            smsReceiver = MySMSBroadcastReceiver()
+            smsReceiver!!.initOTPListener(this)
+
+            val intentFilter = IntentFilter()
+            intentFilter.addAction(SmsRetriever.SMS_RETRIEVED_ACTION)
+            this.registerReceiver(smsReceiver, intentFilter)
+
+            val client = SmsRetriever.getClient(this)
+
+            val task = client.startSmsRetriever()
+            task.addOnSuccessListener {
+                // API successfully started
+                Log.d("task", "addOnSuccessListener")
+            }
+
+            task.addOnFailureListener {
+                // Fail to start API
+                Log.d("task", "addOnFailureListener")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+    }
+
 
     private fun sendVerificationCode() {
         tvVerifyText.text = "We have send you an SMS on $mobile with 6 digit verification code."
@@ -197,7 +275,8 @@ class VerifyAct : AppCompatActivity() {
 
                 override fun onVerificationFailed(e: FirebaseException) {
                     ProjectUtil.pauseProgressDialog()
-                    Toast.makeText(mContext, "Failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(mContext, e.message, Toast.LENGTH_SHORT).show()
+                    e.printStackTrace();
                 }
 
             })

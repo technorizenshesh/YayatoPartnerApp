@@ -71,11 +71,11 @@ class HomeAct : AppCompatActivity() {
             ProjectUtil.logoutAppDialog(mContext)
         }
 
-/*
+
         binding.chlidDashboard.btnUploadedVehicles.setOnClickListener {
             startActivity(Intent(mContext, AddVehicalOnRentActivity::class.java))
         }
-
+/*
         binding.childNavDrawer.btnWallet.setOnClickListener {
             startActivity(Intent(mContext, WalletAct::class.java))
             binding.drawerLayout.closeDrawer(GravityCompat.START)
@@ -103,7 +103,7 @@ class HomeAct : AppCompatActivity() {
         Log.e("sfasdasdas","modelLogin.getResult()?.image = " + modelLogin.getResult()?.image)
 
 
-        //get_all_vehicleApi()
+        get_all_vehicleApi()
     }
 
 

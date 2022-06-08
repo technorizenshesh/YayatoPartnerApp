@@ -55,5 +55,24 @@ interface YayatoApiService {
     ): Call<ResponseBody>
 
 
+    @FormUrlEncoded
+    @POST("get_all_vehicle")
+    fun get_all_vehicle(@Field("user_id") user_id: String): Call<ResponseBody>
+
+
+    @FormUrlEncoded
+    @POST("add_car_patnar_request")
+    fun add_car_patnar_request(
+        @Field("car_id") car_id: String,
+        @Field("base_fire") base_fire: String,
+        @Field("rate_pre_km") rate_pre_km: String,
+        @Field("start_date") start_date: String,
+        @Field("start_time") start_time: String,
+        @Field("end_date") end_date: String,
+        @Field("end_time") end_time: String,
+        @Field("user_id") user_id: String,
+        @Field("status") status: String
+    ): Call<ResponseBody>
+
 
 }

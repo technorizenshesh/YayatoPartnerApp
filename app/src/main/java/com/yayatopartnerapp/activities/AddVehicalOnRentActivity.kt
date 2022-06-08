@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter
 import android.widget.DatePicker
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProviders
 import com.google.gson.Gson
 import com.yayatopartnerapp.R
 import com.yayatopartnerapp.databinding.ActivityAddVehicalOnRentBinding
@@ -22,6 +23,7 @@ import com.yayatopartnerapp.models.ModelCarsType
 import com.yayatopartnerapp.models.ModelLogin
 import com.yayatopartnerapp.models.ModelVehicalList
 import com.yayatopartnerapp.utils.*
+import com.yayatopartnerapp.viewmodel.AddVehicleViewModel
 import com.yayatotaxi.utils.retrofit.Api
 import com.yayatotaxi.utils.retrofit.ApiFactory
 import okhttp3.MediaType
@@ -46,10 +48,15 @@ class AddVehicalOnRentActivity : AppCompatActivity() {
 
     var taxiNamesList = ArrayList<String>()
     var taxiIdsList = ArrayList<String>()
+   // var addVehicleViewModel : AddVehicleViewModel? =null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+      //  addVehicleViewModel = ViewModelProviders.of(this).get(AddVehicleViewModel::class.java)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_vehical_on_rent)
+       // binding.addVehicleViewModel = addVehicleViewModel
+      //  binding.lifecycleOwner
+
         sharedPref = SharedPref(mContext)
         modelLogin = sharedPref!!.getUserDetails(AppConstant.USER_DETAILS)
         binding.etStartDate.setOnClickListener {
@@ -158,6 +165,7 @@ class AddVehicalOnRentActivity : AppCompatActivity() {
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
 
+
         binding.btnSubmit.setOnClickListener {
             if(carId.equals("")){
                 MyApplication.showAlert(mContext, "Please add vehicle")
@@ -180,11 +188,12 @@ class AddVehicalOnRentActivity : AppCompatActivity() {
             }
         }
 
+
     }
 
     override fun onResume() {
         super.onResume()
-        getCars()
+       getCars()
     }
 
     private fun addVehicle() {
@@ -240,6 +249,8 @@ class AddVehicalOnRentActivity : AppCompatActivity() {
                 try {
                     val responseString = response.body()!!.string()
                     Log.e("vehicleData", "responseString = $responseString")
+                    Log.e("Add car", "tttt = $response.body()")
+
                     val jsonObject = JSONObject(responseString)
                     Log.e("vehicleData", "responseString = $responseString")
                     if (jsonObject.getString("status") == "1") {
@@ -262,14 +273,19 @@ class AddVehicalOnRentActivity : AppCompatActivity() {
 
     private fun getCars() {
         ProjectUtil.showProgressDialog(mContext,false,getString(R.string.please_wait))
-        val api: Api = ApiFactory.getClientWithoutHeader(mContext)!!.create(Api::class.java)
-        val call: Call<ResponseBody> = api.get_all_vehicle(modelLogin?.getResult()?.id.toString())
+        val api: Api = ApiFactory.getClientWithoutHeader11(mContext)!!.create(Api::class.java)
+        //modelLogin?.getResult()?.id.toString()
+        val call: Call<ResponseBody> = api.get_all_vehicle("10")
         call.enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 ProjectUtil.pauseProgressDialog()
                 try {
                     val stringResponse = response.body()!!.string()
+                    Log.e("kkkkkkkkk", "tttt = $response.body()")
+
+                    Log.e("getCarsgetCars", "response = $stringResponse")
                     try {
+
                         val jsonObject = JSONObject(stringResponse)
                         if (jsonObject.getString("status") == "1") {
                             val modelVehicalList: ModelVehicalList =
@@ -285,7 +301,6 @@ class AddVehicalOnRentActivity : AppCompatActivity() {
                             )
                             binding.spinnerServiceType.setAdapter(arrayAdapter)
                             carId = taxiNamesList[0]
-                            Log.e("getCarsgetCars", "response = $stringResponse")
                             Log.e("getCarsgetCars", "carId = $carId")
                         } else {
                             Toast.makeText(mContext, getString(R.string.no_data_found), Toast.LENGTH_LONG).show()
