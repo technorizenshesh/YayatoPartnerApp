@@ -75,4 +75,22 @@ interface YayatoApiService {
     ): Call<ResponseBody>
 
 
+
+    @FormUrlEncoded
+    @POST("update_lat_lon")
+    fun update_lat_lon( @Field("user_id") user_id: String,
+                        @Field("lat") lat: String,
+                        @Field("lon") lon: String):  Call<ResponseBody>
+
+
+
+    @FormUrlEncoded
+    @POST("login_partner")
+    fun login_with_otp(@FieldMap params: Map<String, String>): Call<ResponseBody>
+
+
+    @FormUrlEncoded
+    @POST("otp_verify")
+    fun verify_with_otp(@FieldMap params: Map<String, String>): Call<ResponseBody>
+
 }

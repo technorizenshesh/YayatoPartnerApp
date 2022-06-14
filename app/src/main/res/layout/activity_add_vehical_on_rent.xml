@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
 
-    <!--<data>
+  <!--  <data>
 
         <variable
             name="addVehicleViewModel"
@@ -316,6 +316,12 @@
 <!--
                     android:onClick="@{(view)->addVehicleViewModel.onStartDateClick(view)}"
 -->
+
+
+
+
+                 <!--   android:onClick="@{(view)->addVehicleViewModel.onStartDateClick(view)}"
+                    android:text="@{addVehicleViewModel.startDate}"-->
 
 
 

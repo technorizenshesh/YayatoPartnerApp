@@ -94,6 +94,19 @@
             android:name=".activities.AddVehicleAct"
             android:exported="false"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activities.MobileLogin"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+
+        <activity
+            android:name=".activities.LoginVerifyAct"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+
         <activity
             android:name=".activities.SplashAct"
             android:exported="true"

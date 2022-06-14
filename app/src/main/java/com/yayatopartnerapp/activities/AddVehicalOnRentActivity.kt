@@ -23,7 +23,6 @@ import com.yayatopartnerapp.models.ModelCarsType
 import com.yayatopartnerapp.models.ModelLogin
 import com.yayatopartnerapp.models.ModelVehicalList
 import com.yayatopartnerapp.utils.*
-import com.yayatopartnerapp.viewmodel.AddVehicleViewModel
 import com.yayatotaxi.utils.retrofit.Api
 import com.yayatotaxi.utils.retrofit.ApiFactory
 import okhttp3.MediaType
@@ -52,10 +51,10 @@ class AddVehicalOnRentActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-      //  addVehicleViewModel = ViewModelProviders.of(this).get(AddVehicleViewModel::class.java)
+       // addVehicleViewModel = ViewModelProviders.of(this).get(AddVehicleViewModel::class.java)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_vehical_on_rent)
-       // binding.addVehicleViewModel = addVehicleViewModel
-      //  binding.lifecycleOwner
+     //   binding.addVehicleViewModel = addVehicleViewModel
+     //   binding.lifecycleOwner
 
         sharedPref = SharedPref(mContext)
         modelLogin = sharedPref!!.getUserDetails(AppConstant.USER_DETAILS)

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import com.bumptech.glide.Glide
+import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import com.yayatopartnerapp.R
 import com.yayatopartnerapp.adapters.AdapterAllVehicle
@@ -20,8 +21,11 @@ import com.yayatopartnerapp.models.ModelCarsRent
 import com.yayatopartnerapp.models.ModelLogin
 import com.yayatopartnerapp.models.ModelVehicalList
 import com.yayatopartnerapp.utils.AppConstant
+import com.yayatopartnerapp.utils.GPSTracker
 import com.yayatopartnerapp.utils.ProjectUtil
 import com.yayatopartnerapp.utils.SharedPref
+import com.yayatopartnerapp.utils.retrofit.ApiClient
+import com.yayatopartnerapp.utils.retrofit.YayatoApiService
 import com.yayatotaxi.utils.retrofit.Api
 import com.yayatotaxi.utils.retrofit.ApiFactory
 import okhttp3.ResponseBody
@@ -29,6 +33,7 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.create
 
 class HomeAct : AppCompatActivity() {
 
@@ -36,6 +41,8 @@ class HomeAct : AppCompatActivity() {
     lateinit var binding: ActivityHomeBinding
     lateinit var sharedPref: SharedPref
     lateinit var modelLogin: ModelLogin
+    var currentLocation: LatLng? = null
+    lateinit var tracker: GPSTracker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,6 +101,8 @@ class HomeAct : AppCompatActivity() {
         super.onResume()
         sharedPref = SharedPref(mContext)
         modelLogin = sharedPref.getUserDetails(AppConstant.USER_DETAILS)
+        tracker = GPSTracker(mContext)
+        currentLocation = LatLng(tracker.latitude, tracker.longitude)
         Glide.with(mContext).load(modelLogin.getResult()?.image)
             .error(R.drawable.user_ic)
             .placeholder(R.drawable.user_ic)
@@ -104,6 +113,7 @@ class HomeAct : AppCompatActivity() {
 
 
         get_all_vehicleApi()
+        update_lat_lonApi()
     }
 
 
@@ -152,4 +162,37 @@ class HomeAct : AppCompatActivity() {
 
         })
     }
+
+
+    private fun update_lat_lonApi() {
+        val call: Call<ResponseBody> = ApiClient.getClient(mContext)!!.create(YayatoApiService::class.java).update_lat_lon(
+            modelLogin.getResult()?.id.toString(),
+            currentLocation?.latitude.toString(),
+            currentLocation?.longitude.toString()
+        )
+
+        call.enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                try {
+                    val responseString = response.body()!!.string()
+                    val jsonObject = JSONObject(responseString)
+                    Log.e("update_lat_lon", "responseString = $responseString")
+//                    if (jsonObject.getString("status") == "1") {
+//                        Toast.makeText(applicationContext, jsonObject.getString("message"), Toast.LENGTH_SHORT).show()
+//                    }
+
+                } catch (e: Exception) {
+                    Log.e("Exception", "Exception = " + e.message)
+                }
+            }
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                Log.e("Throwable", "Throwable = " + t.message)
+            }
+        })
+    }
+
+
+
+
+
 }

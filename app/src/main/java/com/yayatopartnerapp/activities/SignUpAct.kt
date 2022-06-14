@@ -12,9 +12,11 @@ import android.provider.MediaStore
 import android.text.TextUtils
 import android.util.Log
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
@@ -27,6 +29,7 @@ import com.yayatopartnerapp.utils.*
 import com.yayatopartnerapp.utils.ProjectUtil.Companion.getImageUri
 import com.yayatopartnerapp.viewmodel.LoginViewModel
 import com.yayatopartnerapp.viewmodel.SignupMainViewModel
+import com.yayatopartnerapp.viewmodel.SignupViewModel
 import kotlinx.android.synthetic.main.activity_sign_up.*
 import java.io.File
 import java.util.*
@@ -40,18 +43,34 @@ class SignUpAct: AppCompatActivity() {
     private val CAMERA = 1;
     lateinit var registerId: String
     var sharedPref: SharedPref? = null
-    var modelLogin: ModelLogin? = null
+    lateinit var modelLogin: ModelLogin
     var profileImage: File? = null
     private var latLng: LatLng? = null
-    var signupViewModel: SignupMainViewModel? = null
+    var signupViewModel : SignupViewModel? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        signupViewModel = ViewModelProviders.of(this).get(SignupViewModel::class.java)
         binding =  DataBindingUtil.setContentView(this,R.layout.activity_sign_up)
-     //   binding.signupViewModel = signupViewModel
+        binding.signupViewModel = signupViewModel
         sharedPref = SharedPref(mContext)
         initViews()
+
+
+        signupViewModel!!.getSignupDataViewModel()!!.observe(this,{
+            if (it != null) {
+                modelLogin =  it;
+                Toast.makeText(mContext,R.string.signup_sucess, Toast.LENGTH_LONG)
+                startActivity(Intent(mContext, LoginAct::class.java))
+                finish()
+
+            } else {
+                MyApplication.showAlert(mContext, modelLogin.getMessage()!!)
+
+            }
+        })
+
     }
 
     private fun initViews() {
@@ -125,7 +144,9 @@ class SignUpAct: AppCompatActivity() {
             params["first_name"] = etFirstName.text.toString().trim()
             params["last_name"] = etLastName.text.toString().trim()
             params["email"] = etEmail.text.toString().trim()
-            params["mobile"] = etPhone.text.toString().trim()
+           // params["mobile"] = "+237" + etPhone.text.toString().trim()
+            params["mobile"] = "+91" + etPhone.text.toString().trim()
+
             params["city"] = etCityName.text.toString().trim()
             params["address"] = etAdd1.text.toString().trim()
             params["register_id"] = registerId
@@ -138,15 +159,13 @@ class SignUpAct: AppCompatActivity() {
             Log.e(TAG, "signupUser = $params")
             Log.e(TAG, "fileHashMap = $fileHashMap")
 
-            //val mobileNumber = "+237" + etPhone.text.toString().trim()
-                val mobileNumber = "+91"  + etPhone.text.toString().trim()
+            if (InternetConnection.checkConnection(mContext)) signupViewModel!!.signupApiCallViewModel(params["first_name"]!!,params["last_name"]!!
+                ,params["email"]!!,params["mobile"]!!,params["address"]!!,params["register_id"]!!,params["lat"]!!
+                , params["lon"]!!,params["password"]!!,params["type"]!!,"1",fileHashMap["image"]!!)
+            else MyApplication.showConnectionDialog(mContext)
 
-            startActivity(
-                Intent(mContext, VerifyAct::class.java)
-                    .putExtra("resgisterHashmap", params)
-                    .putExtra("mobile", mobileNumber)
-                    .putExtra("fileHashMap", fileHashMap)
-            )
+
+
 
         }
     }

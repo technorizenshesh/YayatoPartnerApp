@@ -8,38 +8,50 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.DatePicker
+import android.widget.EditText
+import androidx.databinding.BaseObservable
 import androidx.databinding.Bindable
 import androidx.databinding.Observable
 import androidx.databinding.PropertyChangeRegistry
 import androidx.databinding.library.baseAdapters.BR
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.*
+import com.yayatopartnerapp.models.AddVehicleModel
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.lifecycle.MutableLiveData
 
 
-class AddVehicleViewModel(application: Application) : AndroidViewModel(application), Observable {
-    // var loginViewModel: LiveData<ModelLogin?>? = null
+
+
+
+class AddVehicleViewModel : ViewModel(),Observable {
     var context: Context? = null
-    private val callbacks: PropertyChangeRegistry = PropertyChangeRegistry()
+
+    val startDate: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
 
 
-    var startDate = MutableLiveData<String>()
+     var model: MutableLiveData<AddVehicleModel?> = MutableLiveData()
 
 
     fun init(context: Context) {
         this.context = context
+        startDate!!.value = "Start Date"
+
+        // model = MutableLiveData<AddVehicleModel?>()
         //  loginRepository  = LoginRepository(context)
         // loginViewModel = loginRepository!!.getLognUserData()
         // getFirebaseToken()
     }
 
+
+
+
     fun onStartDateClick(view: View) {
         var cal = Calendar.getInstance()
         // create an OnDateSetListener
-        Log.e("Chala==","click challl===")
+        Log.e("Chala==", "click challl===")
         val dateSetListener = object : DatePickerDialog.OnDateSetListener {
             override fun onDateSet(
                 view: DatePicker, year: Int, monthOfYear: Int,
@@ -53,54 +65,38 @@ class AddVehicleViewModel(application: Application) : AndroidViewModel(applicati
 //                    datecurr=sdf.format(cal.getTime())
                 // binding.etStartDate!!.setText(sdf.format(cal.getTime()))
 
-                setStartDate(sdf.format(cal.getTime()))
+                startDate!!.value = sdf.format(cal.getTime())
+                Log.e("Date====",startDate!!.value.toString())
+
+
+                // model.value!!.setStartDate(sdf.format(cal.getTime()))
 
             }
         }
 
-        DatePickerDialog(view.context,
+        DatePickerDialog(
+            view.context,
             dateSetListener,
             // set DatePickerDialog to point to today's date when it loads up
             cal.get(Calendar.YEAR),
             cal.get(Calendar.MONTH),
-            cal.get(Calendar.DAY_OF_MONTH)).show()
-
+            cal.get(Calendar.DAY_OF_MONTH)
+        ).show()
     }
 
 
-    @Bindable
-    fun getStartDate(): LiveData<String?>? {
-        return startDate
-    }
 
 
-    fun setStartDate(value: String) {
-        startDate.value = value
-       // notifyPropertyChanged(BR.)
-    }
+
+
+
+
 
     override fun addOnPropertyChangedCallback(callback: Observable.OnPropertyChangedCallback?) {
-        callbacks.add(callback)
+
     }
 
     override fun removeOnPropertyChangedCallback(callback: Observable.OnPropertyChangedCallback?) {
-        callbacks.remove(callback)
-    }
-
-
-    fun notifyChange() {
-        callbacks.notifyCallbacks(this, 0, null)
-    }
-
-    /**
-     * Notifies observers that a specific property has changed. The getter for the
-     * property that changes should be marked with the @Bindable annotation to
-     * generate a field in the BR class to be used as the fieldId parameter.
-     *
-     * @param fieldId The generated BR id for the Bindable field.
-     */
-    fun notifyPropertyChanged(fieldId: Int) {
-        callbacks.notifyCallbacks(this, fieldId, null)
     }
 
 

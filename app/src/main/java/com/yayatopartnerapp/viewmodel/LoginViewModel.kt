@@ -17,6 +17,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.messaging.FirebaseMessaging
 import com.yayatopartnerapp.R
 import com.yayatopartnerapp.activities.ForgotPassAct
+import com.yayatopartnerapp.activities.MobileLogin
 import com.yayatopartnerapp.activities.SignUpAct
 import com.yayatopartnerapp.models.ModelLogin
 import com.yayatopartnerapp.repository.LoginRepository
@@ -64,6 +65,14 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) ,
         context!!.startActivity(Intent(context, SignUpAct::class.java))
 
     }
+
+    fun signinOtpClick(view : View){
+        context!!.startActivity(Intent(context, MobileLogin::class.java))
+
+    }
+
+
+
     fun validation(){
         if (TextUtils.isEmpty(email.value)) {
             MyApplication.showAlert(context!!, context!!.getString(R.string.enter_email_text))

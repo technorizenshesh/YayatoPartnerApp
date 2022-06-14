@@ -6,6 +6,8 @@
     <string name="no">No</string>
     <string name="api_key" translatable="false">AIzaSyA9RhUjM4t6hd1FZn671IXvE4m4Ijw87T0</string>
     <string name="login">Login</string>
+    <string name="login_wth_otp">Login with OTP</string>
+
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="forgot_your_password">Forgot Password?</string>
@@ -236,5 +238,8 @@
     <string name="signup_sucess">Signup Successfully</string>
     <string name="profile_updated">Profile updated</string>
     <string name="invalid_input">invalid input</string>
+    <string name="or">OR</string>
+    <string name="login_wth_number">Login with Number</string>
+    <string name="send_otp">Send OTP</string>
 
 </resources>
